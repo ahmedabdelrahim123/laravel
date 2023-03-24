@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
+
 use App\Models\User;
 use App\Models\Post;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Str;
+
+
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -37,21 +42,41 @@ class PostController extends Controller
     }
 
     public function store(StorePostRequest $request)
-    {
-
+    {  
         $title = request()->title;
         $description = request()->description;
         $postCreator = request()->post_creator;
+         
+        // $file_name = $this->saveImage($request->image, 'images/imgpost');
+        $path = Storage::putFile('public', $request->file('image'));
+        
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $filename = $image->getClientOriginalName();
+            $path = Storage::putFileAs('public/posts', $image, $filename);
+            // $post->image = $path;
+            // $post->save();
+        }
 
         //insert the form data in the database
         Post::create([
             'title' => $title,
             'description' => $description,
             'user_id' => $postCreator,
+            'image' => $path
         ]);
 
         //redirect to index route
         return to_route('posts.index');
+    }
+    protected function saveImage($photo,$folder){
+        //save photo in folder
+        $file_extension = $photo -> getClientOriginalExtension();
+        $file_name = time().'.'.$file_extension;
+        $path = $folder;
+        $photo -> move($path,$file_name);
+    
+        return $file_name;
     }
 
  public function edit($id){
@@ -61,13 +86,33 @@ class PostController extends Controller
     return view('post.edit',['post' => $post],['users' => $users]); }   
 
 
-public function update(Request $request,$id){
-    Post::find($id)->update([
-        'title' => request('title'),
-        'description' => request('description')
-    ]);
-    return to_route('posts.index');
+public function update(StorePostRequest $request ,$id){
+    $post=Post::find($id);
+    $title= request()->title;
+    $description=request()->description;
+    $postCreator=request()->post_creator;
+
+    $path = Storage::putFile('public', $request->file('image'));
+        
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $filename = $image->getClientOriginalName();
+        $path = Storage::putFileAs('public/posts', $image, $filename);
+        $post->image = $path;
+    }
+
+    if ($post->title!=$title){
+        $post->title=$title;
+    }if($post->description!=$description){
+        $post->description=$description;
+    }if($post->user_id!=$postCreator){
+        $post->user_id=$postCreator;
+    }
+
+    $post->save();
+    return redirect()->back();
 }
+
 
 
 public function destroy($id)

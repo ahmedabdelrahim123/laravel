@@ -16,7 +16,11 @@
     <p>{{$post['title']}}</p>
     <h5 class="card-title">Description:</h5>
     <p class="card-text">{{$post['description']}}</p>
-    <p class=" text-danger card-text"><span class="fw-bold">created At:</span><br> {{ $post->created_at->format('l jS \\of F Y h:i:s A') }}</h5>  </div>
+    <img src="{{$post['image']}}" alt="">
+    @if($post->image)
+            <img src="{{Storage::url($post->image)}}" width="250px"   alt="{{$post->image}}">
+        @endif
+   <p class=" text-danger card-text"><span class="fw-bold">created At:</span><br> {{ $post->created_at->format('l jS \\of F Y h:i:s A') }}</h5>  </div>
 </div>
 <div class="card m-3">
   <div class="card-header">
@@ -26,7 +30,7 @@
   <p class="card-title"><span class="fw-bold">Author:</span><br> {{ optional($post->user)->name ?? 'Not Found' }}</h5>
             <p class="card-text"><span class="fw-bold">Email:</span><br> {{optional($post->user)->email ?? 'Not Found'}}</p>
                 <p class=" text-danger card-text"><span class="fw-bold">created At:</span><br> {{ $post->created_at->format('l jS \\of F Y h:i:s A') }}</h5>
-   
+                
   </div>
 </div>
 

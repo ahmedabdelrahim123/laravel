@@ -43,6 +43,15 @@ return [
             'visibility' => 'public',
             'throw' => false,
         ],
+          
+        'imgpost' => [
+            'driver' => 'local',
+            'root' => base_path().'public/images/imgpost/',
+            'url' => env('APP_URL').'/public',
+            'visibility' => 'public',
+            
+        ],
+
 
         's3' => [
             'driver' => 's3',
