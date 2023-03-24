@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use \Cviebrock\EloquentSluggable\Services\SlugService;
 use App\Http\Requests\StorePostRequest;
-
+use App\Jobs\PruneOldPostsJobs;
 use App\Models\User;
 use App\Models\Post;
 use Illuminate\Support\Facades\Storage;
@@ -54,30 +54,21 @@ class PostController extends Controller
             $image = $request->file('image');
             $filename = $image->getClientOriginalName();
             $path = Storage::putFileAs('public/posts', $image, $filename);
-            // $post->image = $path;
-            // $post->save();
         }
-
+        $slug = SlugService::createSlug(Post::class, 'slug', request()->title);
         //insert the form data in the database
         Post::create([
-            'title' => $title,
+
+            'title' => $slug ?? $title,
             'description' => $description,
             'user_id' => $postCreator,
             'image' => $path
         ]);
-
+       
         //redirect to index route
         return to_route('posts.index');
     }
-    protected function saveImage($photo,$folder){
-        //save photo in folder
-        $file_extension = $photo -> getClientOriginalExtension();
-        $file_name = time().'.'.$file_extension;
-        $path = $folder;
-        $photo -> move($path,$file_name);
-    
-        return $file_name;
-    }
+  
 
  public function edit($id){
     $users = User::all();
@@ -85,7 +76,14 @@ class PostController extends Controller
     // dd($post);   
     return view('post.edit',['post' => $post],['users' => $users]); }   
 
+    public function removeOldPosts()
+    {
+        // dispatch(new PruneOldPostsJob);
 
+        PruneOldPostsJobs::dispatch();
+
+        return to_route('posts.index');
+    }
 public function update(StorePostRequest $request ,$id){
     $post=Post::find($id);
     $title= request()->title;

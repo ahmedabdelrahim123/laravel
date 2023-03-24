@@ -22,8 +22,8 @@
         @foreach($posts as $post)
             <tr>
                 <td>{{$post->id}}</td>
-                <td>{{$post->title}}</td>
-                <td>{{ optional($post->user)->name ?? 'Not Found' }}</td>
+                    <td>{{$post->title}}</td>     
+               <td>{{ optional($post->user)->name ?? 'Not Found' }}</td>
                 <td>{{$post->created_at->format('Y-m-d')}}</td>
                 <td>
                 <form action="{{ route('posts.destroy', $post->id) }}" method="POST">

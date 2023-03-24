@@ -4,7 +4,7 @@ use App\Http\Controllers\PostController;
 
 use App\Http\Controllers\CommentController;
 
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Route::get('/', [TestController::class, 'test']);
-
+Route::get("/posts/removeOld",[PostController::class,"removeOldPosts"]);
 Route::group(['middleware' => ['auth']],function(){
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 
